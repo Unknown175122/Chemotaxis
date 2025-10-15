@@ -23,25 +23,14 @@ void draw() {
   }
   rect(0,0,400,400);
   if (mousePressed){
-    fill(255,140,0,80);
+    if (attraction < 0){fill(0,17,200,80);} 
+    else if (attraction == 0){fill(255,80);}
+    else{fill(255,140,0,80);}
     drawFire();
     //ellipse(mouseX, mouseY, 50,75); //sculpt fire using curveVertex tool
   }
   for (int i = 0; i<dots.length-dotsHidden; i++){ //loop thru all dots shown
-    if (mousePressed){
-      if (mouseX > dots[i].myX){
-        dots[i].myX += attraction;
-      }
-      if (mouseX < dots[i].myX){
-        dots[i].myX -= attraction;
-      }
-      if (mouseY > dots[i].myY){
-        dots[i].myY += attraction;
-      }
-      if (mouseY < dots[i].myY){
-        dots[i].myY -= attraction;
-      }
-    }
+    
     fill(255);
     dots[i].move();
     dots[i].reRoll(); //random part
@@ -87,7 +76,7 @@ void keyPressed(){
   }
   
   if (key == 'x'){
-    if (attraction > 1){
+    if (attraction > -15){ //negative attraction is crazy strong
     attraction -= 1;
     }
   }
@@ -102,18 +91,18 @@ class Dot
   int myX, myY, xDir, yDir, speed;
   double ran;
   Dot(){
-    myX = (int)(Math.random()*401);
+    myX = (int)(Math.random()*401); //random spawn
     myY = (int)(Math.random()*401);
-    xDir = (int)(Math.random()*3)-1;
+    xDir = (int)(Math.random()*3)-1; //random starting direction
     yDir = (int)(Math.random()*3)-1;
-    ran = Math.random()*2 +1;
-    speed = 5;
+    ran = Math.random()*2 +1; //fun value
+    speed = 5; //adjustability???
   }
   
-  void move(){
+  void move(){ //move in eight directions
     if (xDir == 0){
       if (yDir == 0){
-        yDir += 1;
+        yDir += 1; //can't be still
       }
       myY += yDir * speed;
     } else if (yDir == 0){
@@ -122,31 +111,30 @@ class Dot
       myX += xDir * speed/ran;
       myY += yDir * speed/ran;
     }
-    //if (direction == 1){
-    //  myX -= speed;
-    //} else if (direction == 2){
-    //  myX -= speed/2;
-    //  myY -= speed/2;
-    //} else if (direction == 3){
-    //  myY -= speed;
-    //} else if (direction == 4){
-    //  myX += speed/2;
-    //  myY -= speed/2;
-    //} else if (direction == 5){
-    //  myX += speed;
-    //} else if (direction == 6){
-    //  myX += speed/2;
-    //  myY += speed/2;
-    //} else if (direction == 7){
-    //  myY += speed;
-    //} else {
-    //  myX -= speed/2;
-    //  myY += speed/2;
-    //} 
+    this.biasedMvt();
     this.detectCollision();
   }
   
-  void detectCollision(){
+  void biasedMvt(){ //biased random
+    if (mousePressed){
+      if (mouseX > myX){
+        myX += (int) (Math.random() * 7) -3 +attraction;
+      }
+      if (mouseX < myX){
+        myX += (int) (Math.random() * 7) -3 -attraction;
+      }
+      if (mouseY > myY){
+        myY += (int) (Math.random() * 7) -3 +attraction;
+      }
+      if (mouseY < myY){
+        myY += (int) (Math.random() * 7) -3 -attraction;
+      }
+    }else{
+       myX += (int) (Math.random() * 7) -3;
+      myY += (int) (Math.random() * 7) -3;
+    }
+  }
+  void detectCollision(){ //prevent from going offscreen
     if (myX > width || myX < 0){
       if (xDir == 1){
         if (myX > 200){myX = width;}
@@ -167,7 +155,7 @@ class Dot
     }
   }
   
-  void reRoll(){
+  void reRoll(){ //pick new direction???
     ran = Math.random()*2 +1;
     if (ran > 2.7){
       xDir = (int)(Math.random()*3)-1;
@@ -176,9 +164,7 @@ class Dot
   }
   
   void show(){
-     myX += (int) (Math.random() * 7) -3;
-    myY += (int) (Math.random() * 7) -3;
-    ellipse(myX, myY, 10,10);
+    ellipse(myX, myY, 7,7);
   }
   
 
@@ -196,11 +182,3 @@ void drawFire(){
   vertex(mouseX+25,mouseY+7);
   endShape();
 }
-
-
-
-
-
-
-
-
